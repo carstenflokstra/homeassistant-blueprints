@@ -1,0 +1,108 @@
+blueprint:
+  name: Alarm Lights with Dynamic Setup
+  description: A dynamic alarm automation that triggers lights, notifications, and media playback based on motion or device events.
+  domain: automation
+  input:
+    motion_sensors:
+      name: Motion Sensors
+      description: Select one or more motion sensors to trigger the alarm.
+      selector:
+        target:
+          entity:
+            domain: binary_sensor
+    alarm_condition:
+      name: Arm Intruder Alarm
+      description: Input boolean to arm the alarm.
+      selector:
+        entity:
+          domain: input_boolean
+    media_players:
+      name: Media Players
+      description: Media players to play alarm sounds.
+      selector:
+        target:
+          entity:
+            domain: media_player
+    notification_device:
+      name: Notification Device
+      description: Mobile device to send notifications.
+      selector:
+        device:
+    alert_lights:
+      name: Lights
+      description: Select lights to turn on and flash during the alarm.
+      selector:
+        target:
+          entity:
+            domain: light
+    media_url:
+      name: Media URL
+      description: URL or local file for the alarm sound (e.g., Spotify playlist, song, or local file).
+      selector:
+        text:
+    day_volume:
+      name: Daytime Volume
+      description: Volume level for daytime playback.
+      default: 0.5
+      selector:
+        number:
+          min: 0
+          max: 1
+          step: 0.05
+    night_volume:
+      name: Nighttime Volume
+      description: Volume level for nighttime playback.
+      default: 0.15
+      selector:
+        number:
+          min: 0
+          max: 1
+          step: 0.05
+
+trigger:
+  - platform: state
+    entity_id: !input motion_sensors
+    from: "off"
+    to: "on"
+
+condition:
+  - condition: state
+    entity_id: !input alarm_condition
+    state: "on"
+
+action:
+  - choose:
+      - conditions:
+          - condition: sun
+            after: sunset
+            before: sunrise
+        sequence:
+          - service: media_player.volume_set
+            target: !input media_players
+            data:
+              volume_level: !input night_volume
+    default:
+      - service: media_player.volume_set
+        target: !input media_players
+        data:
+          volume_level: !input day_volume
+  - service: notify
+    target:
+      device_id: !input notification_device
+    data:
+      title: 🚨 Intruder Alarm Triggered!
+      message: >-
+        The alarm has been triggered. Check cameras and call emergency services
+        if needed.
+  - service: light.turn_on
+    target: !input alert_lights
+    data:
+      flash: long
+      rgb_color: [255, 0, 0]
+      brightness_pct: 100
+  - service: media_player.play_media
+    target: !input media_players
+    data:
+      media_content_id: !input media_url
+      media_content_type: music
+

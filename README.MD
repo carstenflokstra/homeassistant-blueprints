@@ -38,17 +38,18 @@ Welcome to my collection of reusable Home Assistant blueprints! These blueprints
 
 ## 🛠️ How to Use a Blueprint
 
-1. Open Home Assistant and navigate to **Settings** > **Automations & Scenes** > **Blueprints**.
-2. Click on **Import Blueprint**.
-3. Enter the raw URL of the blueprint file from this repository, for example:
+1. Check the README.md on the different blueprints in the `blueprints` folder in this repository
+2. Open Home Assistant and navigate to **Settings** > **Automations & Scenes** > **Blueprints**.
+3. Click on **Import Blueprint**.
+4. Enter the raw URL of the blueprint file from this repository, for example:
    - For **Alarm Lights with Dynamic Speakers**:
      ```
-      https://raw.githubusercontent.com/carstenflokstra/homeassistant-blueprints/main/alarm-lights-blueprint.yaml    
+      https://raw.githubusercontent.com/carstenflokstra/homeassistant-blueprints/main/blueprints/alarm-automation/alarm-automation.yaml    
      ```
 
    - For **Phillips Hue Automation Blueprint**:
      ```
-     https://raw.githubusercontent.com/carstenflokstra/homeassistant-blueprints/main/phillips-hue-automation-blueprint.yml
+     https://raw.githubusercontent.com/carstenflokstra/homeassistant-blueprints/main/blueprints/phillips-hue-motion/phillips-hue-automation-blueprint.yml
      ```
 4. Click **Preview** and then **Import Blueprint**.
 
