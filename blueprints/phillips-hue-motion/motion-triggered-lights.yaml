@@ -1,0 +1,115 @@
+blueprint:
+  name: Motion Triggered Lights with Dimming
+  description: >
+    Automates lights when motion is detected, with options for brightness, color, dimming before turning off, and ignoring activation if lights are already on.
+  domain: automation
+  input:
+    motion_sensor:
+      name: Motion Sensor
+      description: The motion sensor to trigger the automation.
+      selector:
+        entity:
+          domain: binary_sensor
+    lights:
+      name: Lights
+      description: Select one or more lights to control.
+      selector:
+        target:
+          entity:
+            domain: light
+    ignore_if_lights_on:
+      name: Ignore if Lights Are On
+      description: Prevent activating the lights if they are already on.
+      default: false
+      selector:
+        boolean: {}
+    light_color:
+      name: Light Color
+      description: The RGB color for lights when motion is detected.
+      default: [255, 255, 255]
+      selector:
+        color_rgb: {}
+    brightness:
+      name: Brightness Percentage
+      description: The brightness level for lights when motion is detected.
+      default: 100
+      selector:
+        number:
+          min: 1
+          max: 100
+          unit_of_measurement: "%"
+          mode: slider
+    dimming_percentage:
+      name: Dimming Percentage
+      description: The percentage to dim lights before turning them off.
+      default: 30
+      selector:
+        number:
+          min: 1
+          max: 100
+          unit_of_measurement: "%"
+          mode: slider
+    delay_duration:
+      name: Delay Duration
+      description: The time to wait after motion stops before dimming or turning off lights.
+      default: 120
+      selector:
+        number:
+          min: 10
+          max: 3600
+
+trigger:
+  - platform: state
+    entity_id: !input motion_sensor
+    to: "on"
+  - platform: state
+    entity_id: !input motion_sensor
+    to: "off"
+
+condition: []
+
+action:
+  - choose:
+      # Motion Detected
+      - conditions:
+          - condition: state
+            entity_id: !input motion_sensor
+            state: "on"
+          - condition: or
+            conditions:
+              - condition: template
+                value_template: >
+                  {{ not inputs.ignore_if_lights_on }}
+              - condition: template
+                value_template: >
+                  {{ expand(inputs.lights) | selectattr('state', 'eq', 'on') | list | length == 0 }}
+        sequence:
+          - service: light.turn_on
+            target: !input lights
+            data:
+              brightness_pct: !input brightness
+              rgb_color: !input light_color
+
+      # Motion Stopped
+      - conditions:
+          - condition: state
+            entity_id: !input motion_sensor
+            state: "off"
+        sequence:
+          - wait_for_trigger:
+              - platform: state
+                entity_id: !input motion_sensor
+                to: "on"
+            timeout: "{{ '{:02}:{:02}:{:02}'.format((inputs.delay_duration // 3600), (inputs.delay_duration % 3600) // 60, (inputs.delay_duration % 60)) }}"
+            continue_on_timeout: true
+          - condition: state
+            entity_id: !input motion_sensor
+            state: "off"
+          - service: light.turn_on
+            target: !input lights
+            data:
+              brightness_pct: >
+                {{ (states.light | map(attribute='attributes.brightness') | first | int / 2.55 * (inputs.dimming_percentage / 100)) | round }}
+          - delay: "00:00:10"
+          - service: light.turn_off
+            target: !input lights
