@@ -43,8 +43,9 @@ Welcome to my collection of reusable Home Assistant blueprints! These blueprints
 3. Enter the raw URL of the blueprint file from this repository, for example:
    - For **Alarm Lights with Dynamic Speakers**:
      ```
-     https://raw.githubusercontent.com/carstenflokstra/homeassistant-blueprints/main/alarm_lights_dynamic_speakers.yaml
+      https://raw.githubusercontent.com/carstenflokstra/homeassistant-blueprints/main/alarm-lights-blueprint.yaml    
      ```
+
    - For **Phillips Hue Automation Blueprint**:
      ```
      https://raw.githubusercontent.com/carstenflokstra/homeassistant-blueprints/main/phillips-hue-automation-blueprint.yml
