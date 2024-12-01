@@ -29,7 +29,7 @@ This blueprint allows you to automate your Phillips Hue (or other compatible) li
    - Open Home Assistant and navigate to **Settings** > **Automations & Scenes** > **Blueprints**.
    - Click **Import Blueprint** and paste the raw URL:
      ```
-     https://raw.githubusercontent.com/carstenflokstra/homeassistant-blueprints/main/phillips-hue-automation-blueprint.yml
+     https://raw.githubusercontent.com/carstenflokstra/homeassistant-blueprints/refs/heads/main/blueprints/phillips-hue-motion/phillips-hue-automation-blueprint.yml
      ```
 
 2. **Create an Automation**:
