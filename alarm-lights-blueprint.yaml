@@ -1,0 +1,120 @@
+blueprint:
+  name: Alarm Lights with Dynamic Speakers
+  description: Trigger alarms with lights, sound, and notifications based on motion and device events, with dynamic speaker selection.
+  domain: automation
+  input:
+    motion_sensor:
+      name: Motion Sensor
+      description: Motion sensor to trigger the alarm.
+      selector:
+        entity:
+          domain: binary_sensor
+    device_sensor:
+      name: Device Sensor
+      description: Device sensor to trigger the alarm.
+      selector:
+        entity:
+          domain: binary_sensor
+    alarm_condition:
+      name: Alarm Condition
+      description: Input boolean to arm the intruder alarm.
+      selector:
+        entity:
+          domain: input_boolean
+    media_players:
+      name: Media Players
+      description: Media players to use for alarm sounds.
+      selector:
+        target:
+          entity:
+            domain: media_player
+    notification_device:
+      name: Notification Device
+      description: Mobile device to receive notifications.
+      selector:
+        device:
+    alert_lights:
+      name: Alert Lights
+      description: Lights to turn on for the alarm.
+      selector:
+        target:
+          entity:
+            domain: light
+    alert_playlist:
+      name: Alert Playlist
+      description: Spotify playlist to play during the alarm.
+      selector:
+        text
+    flash_lights:
+      name: Flash Lights
+      description: Lights to flash during the alarm.
+      selector:
+        target:
+          entity:
+            domain: light
+
+trigger:
+  - platform: state
+    entity_id: !input motion_sensor
+    from: "off"
+    to: "on"
+  - platform: state
+    entity_id: !input device_sensor
+    to: "on"
+
+condition:
+  - condition: state
+    entity_id: !input alarm_condition
+    state: "on"
+
+action:
+  - choose:
+      - conditions:
+          - condition: sun
+            after: sunset
+            before: sunrise
+        sequence:
+          - service: media_player.volume_set
+            target: !input media_players
+            data:
+              volume_level: 0.15
+    default:
+      - service: media_player.volume_set
+        target: !input media_players
+        data:
+          volume_level: 0.5
+  - service: notify.mobile_app_iphone_van_carsten_flokstra
+    data:
+      title: 🚨 Intruder Alarm has gone off! 🚨
+      message: >-
+        The alarm has been triggered. Check cameras and call 112 in case of an emergency.
+      data:
+        push:
+          sound:
+            name: default
+            critical: 1
+            volume: 1
+  - service: light.turn_on
+    target: !input alert_lights
+    data:
+      rgb_color: [255, 0, 0]
+      brightness_pct: 100
+  - service: media_player.play_media
+    target: !input media_players
+    data:
+      media_content_id: !input alert_playlist
+      media_content_type: music
+  - repeat:
+      count: 15
+      sequence:
+        - service: light.turn_on
+          target: !input flash_lights
+          data:
+            flash: short
+  - service: light.turn_on
+    target:
+      area_id: kitchen
+    data:
+      rgb_color: [0, 132, 255]
+      brightness_pct: 100
+
