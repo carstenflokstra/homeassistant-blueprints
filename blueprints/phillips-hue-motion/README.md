@@ -15,7 +15,6 @@ This repository contains two blueprints to automate your lights or scenes based 
 ### Motion Triggered Scenes
 - **Motion Detection**: Trigger one or more scenes when motion is detected. 👀
 - **Scene Activation**: Directly activate scenes without additional configuration. ✨
-- **Delay Duration**: Set a delay after motion stops before deactivating the scenes. ⏳
 
 ---
 
@@ -79,7 +78,6 @@ This repository contains two blueprints to automate your lights or scenes based 
 |-----------------------|-------------------------------------------------------------|--------------|
 | **Motion Sensor**     | The motion sensor entity to monitor.                        | _Required_   |
 | **Scenes**            | The scenes to activate when motion is detected.             | _Required_   |
-| **Delay Duration**    | Time in seconds to wait after motion stops before deactivating the scenes. | `120` |
 
 ---
 
